@@ -5,6 +5,7 @@
 2. Jessenia Tsenkman
 3. Milena Petrova
 4. Christine Kaldoja
+5. Timur Sirazitdinov
 
 ## 2. Contributing
 

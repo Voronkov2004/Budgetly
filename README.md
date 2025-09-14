@@ -36,11 +36,14 @@ By automating routine tasks and giving users a clear overview of their finances,
 - **Gradle** – Build automation and dependency management
 
 ## Collaborators and roles
-1. Anton Voronkov
-2. Jessenia Tsenkman
-3. Milena Petrova
-4. Christine Kaldoja
-5. Timur Sirazitdinov
+1. Anton Voronkov – Lead Manager & Developer, coordinates tasks and contributes to coding features.
+2. Jessenia Tsenkman – Designer & Developer, focuses on UI/UX and contributes to coding features.
+3. Milena Petrova – Developer & Presenter, contributes to coding features and provides design support, leads presentations.
+4. Christine Kaldoja – Developer, contributes to coding features and provides design support.
+5. Timur Sirazitdinov – Developer, contributes to coding features.
+
+All members participate in research and editing to maintain documentation and project quality.
+
 
 ## Contributing
 

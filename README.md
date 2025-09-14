@@ -1,10 +1,12 @@
-# Name of the project
+# Budgetly
 
 ## Description
 
+**Budgetly** is a personal finance tracking app built with **Kotlin**.  
+It helps users manage their expenses, track budgets, and gain insights into their spending habits with ease.  
+By automating routine tasks and giving users a clear overview of their finances, **Budgetly** saves time, reduces stress, and makes everyday money management effortless, helping users focus more on living and less on bookkeeping.    
 
-
-## Planned features 
+### Planned features 
 
 1. Add an expense made.
 2. Set metadata of an expense: sum of money, date, name of product/service, and category.
@@ -21,12 +23,17 @@
 13. Track remaining balance for each budgeted category.
 14. Notifications when a category budget reaches 50% or is fully spent.
 
-**Additional features might be implemented**
-13. Add and track income sources (cash, credit card, savings, etc.).
-14. Add income amount to each income source.
-15. Link each expense to the income source it was paid from.
-16. Track remaining money in each income source.
-17. Automatic expense entry from scanned receipts using ChatGPT.
+**Additional features might be implemented**  
+13. Add and track income sources (cash, credit card, savings, etc.).  
+14. Add income amount to each income source.  
+15. Link each expense to the income source it was paid from.  
+16. Track remaining money in each income source.  
+17. Automatic expense entry from scanned receipts using ChatGPT.  
+
+### Tools & Frameworks
+- **Android Studio** – Primary IDE for development
+- **Kotlin** – Main programming language
+- **Gradle** – Build automation and dependency management
 
 ## Collaborators and roles
 1. Anton Voronkov

@@ -23,17 +23,25 @@ By automating routine tasks and giving users a clear overview of their finances,
 13. Track remaining balance for each budgeted category.
 14. Notifications when a category budget reaches 50% or is fully spent.
 
-**Additional features might be implemented**  
+**Additional features for future developement**  
 13. Add and track income sources (cash, credit card, savings, etc.).  
 14. Add income amount to each income source.  
 15. Link each expense to the income source it was paid from.  
 16. Track remaining money in each income source.  
 17. Automatic expense entry from scanned receipts using ChatGPT.  
 
+### Design mockup
+
+<img width="412" height="917" alt="Untitled" src="https://github.com/user-attachments/assets/ff81c06b-4e59-4db6-bf65-476ccd3e63b9" />
+<img width="412" height="917" alt="Untitled (1)" src="https://github.com/user-attachments/assets/6c563f44-81c9-479b-a564-70b6e65caf7d" />
+<img width="412" height="917" alt="Untitled (2)" src="https://github.com/user-attachments/assets/f666ea77-86a6-449a-a300-9c1b7060ad5c" />
+
+
 ### Tools & Frameworks
 - **Android Studio** – Primary IDE for development
 - **Kotlin** – Main programming language
 - **Gradle** – Build automation and dependency management
+
 
 ## Collaborators and roles
 1. Anton Voronkov – Lead Manager & Developer, coordinates tasks and contributes to coding features.

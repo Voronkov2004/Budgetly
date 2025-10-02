@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import ee.ut.cs.budgetly.nav.BudgetlyNavGraph
 import ee.ut.cs.budgetly.ui.theme.BudgetlyTheme
 
 class MainActivity : ComponentActivity() {
@@ -18,13 +19,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BudgetlyTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+            BudgetlyTheme(darkTheme = false, dynamicColor = false) {
+                BudgetlyNavGraph()
             }
         }
     }

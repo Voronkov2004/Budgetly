@@ -312,8 +312,6 @@ fun AddExpenseScreen(
                     ) {
                         Text("Save")
                     }
-
-
                 }
             }
         }

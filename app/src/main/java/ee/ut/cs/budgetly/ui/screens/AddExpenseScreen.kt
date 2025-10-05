@@ -249,16 +249,59 @@ fun AddExpenseScreen(
 
                     Spacer(modifier = Modifier.width(12.dp))
 
+                    val context = androidx.compose.ui.platform.LocalContext.current
+
                     Button(
                         onClick = {
-                            selectedCategory?.let {
-                                onSave(
-                                    name,
-                                    amount.toDoubleOrNull() ?: 0.0,
-                                    it.id,
-                                    date,
-                                    note.ifBlank { null }
-                                )
+                            val parsedAmount = amount.toDoubleOrNull()
+
+                            when {
+                                name.isBlank() -> {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Please enter a name",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                amount.isBlank() -> {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Please enter an amount",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                parsedAmount == null || parsedAmount <= 0 -> {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Amount must be a positive number",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                selectedCategory == null -> {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Please select a category",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                else -> {
+                                    onSave(
+                                        name,
+                                        parsedAmount,
+                                        selectedCategory!!.id,
+                                        date,
+                                        note.ifBlank { null }
+                                    )
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Expense added successfully!",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
                         },
                         shape = RoundedCornerShape(12.dp),
@@ -269,6 +312,8 @@ fun AddExpenseScreen(
                     ) {
                         Text("Save")
                     }
+
+
                 }
             }
         }

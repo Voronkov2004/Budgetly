@@ -1,20 +1,50 @@
 package ee.ut.cs.budgetly.nav
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ee.ut.cs.budgetly.ui.screens.AddExpenseScreen
 import ee.ut.cs.budgetly.ui.screens.HomeScreen
+import ee.ut.cs.budgetly.ui.viewmodel.AddExpenseViewModel
+import ee.ut.cs.budgetly.ui.viewmodel.HomeViewModel
 
 
 @Composable
 fun BudgetlyNavGraph() {
     val nav = rememberNavController()
     NavHost(nav, startDestination = "home") {
-        composable("home") { HomeScreen(
-            onAddClick = { nav.navigate("add") }
-        ) }
-        // composable("add") { AddExpenseScreen() }
-        // composable("profile") { ProfileScreen() }
+        composable("home") {
+
+            val viewModel: HomeViewModel = viewModel()
+
+            val categoryExpenses by viewModel.categoryExpenses.collectAsState()
+
+            val selectedMonth by viewModel.selectedMonth.collectAsState()
+            HomeScreen(
+                selectedMonth = selectedMonth,
+                categoryExpenses = categoryExpenses,
+                onPrevMonth = { viewModel.prevMonth() },
+                onNextMonth = { viewModel.nextMonth() },
+                onAddClick = { nav.navigate("add") }
+            )
+        }
+        composable("add") {
+            val viewModel: AddExpenseViewModel = viewModel()
+            val categories by viewModel.categories.collectAsState()
+
+            AddExpenseScreen(
+                categoryList = categories,
+                onSave = { name, amount, categoryId, date, note ->
+                    viewModel.addExpense(name, amount, categoryId, date, note)
+                    nav.popBackStack()
+                },
+                onCancel = { nav.popBackStack() }
+            )
+        }
+
     }
 }

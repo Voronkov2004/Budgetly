@@ -4,20 +4,29 @@ package ee.ut.cs.budgetly.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import ee.ut.cs.budgetly.domain.model.CategoryExpenseSummary
+import ee.ut.cs.budgetly.ui.component.CategoryPieChart
+import java.util.Calendar
+import java.util.Locale
 
 
 @Composable
@@ -25,7 +34,10 @@ fun HomeScreen(
     onMenuClick: () -> Unit = {},
     onAddClick: () -> Unit = {},
     onPrevMonth: () -> Unit = {},
-    onNextMonth: () -> Unit = {}
+    onNextMonth: () -> Unit = {},
+    categoryExpenses: List<CategoryExpenseSummary> = emptyList(),
+    selectedMonth: Calendar
+
 ) {
     val cs = MaterialTheme.colorScheme
     val creamShape = RoundedCornerShape(24.dp)
@@ -109,7 +121,11 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             IconButton(onClick = onPrevMonth) { Icon(Icons.Default.ChevronLeft, null) }
-                            Text("July 2025", style = MaterialTheme.typography.titleMedium)
+                            val monthText = remember(selectedMonth) {
+                                val sdf = java.text.SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+                                sdf.format(selectedMonth.time)
+                            }
+                            Text(monthText, style = MaterialTheme.typography.titleMedium)
                             IconButton(onClick = onNextMonth) { Icon(Icons.Default.ChevronRight, null) }
                         }
                     }
@@ -120,14 +136,57 @@ fun HomeScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth().height(220.dp),
                         shape = RoundedCornerShape(16.dp)
-                    ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Pie placeholder") } }
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (categoryExpenses.isNotEmpty()) {
+                                CategoryPieChart(categoryExpenses)
+                            } else {
+                                Text("No data", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
 
                     Spacer(Modifier.height(20.dp))
 
                     Card(
                         modifier = Modifier.fillMaxWidth().weight(1f),
                         shape = RoundedCornerShape(16.dp)
-                    ) { Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) { Text("List placeholder") } }
+                    ) { LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+
+                        item {
+                            Row(
+                                Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Category", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                Text("Spent", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                            }
+                            HorizontalDivider(
+                                Modifier,
+                                DividerDefaults.Thickness,
+                                color = Color.Gray.copy(alpha = 0.3f)
+                            )
+                        }
+
+
+                        items(categoryExpenses) { item ->
+                            Row(
+                                Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(item.categoryName, style = MaterialTheme.typography.bodyLarge)
+                                Text("${item.totalAmount} €", style = MaterialTheme.typography.bodyLarge)
+                            }
+                            HorizontalDivider(
+                                Modifier,
+                                DividerDefaults.Thickness,
+                                color = Color.Gray.copy(alpha = 0.3f)
+                            )
+                        }
+                    } }
                 }
             }
         }

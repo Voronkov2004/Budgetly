@@ -44,20 +44,35 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ee.ut.cs.budgetly.data.entity.Category
+import java.util.Calendar
 
 @Composable
 fun AddExpenseScreen(
     categoryList: List<Category>,
+    selectedMonth: Calendar,
     onSave: (name: String, amount: Double, categoryId: Int, date: Long, note: String?) -> Unit,
     onCancel: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
     val creamShape = RoundedCornerShape(24.dp)
 
+    val defaultDateMillis = remember(selectedMonth) {
+        val today = Calendar.getInstance()
+        val dayInMonth = minOf(
+            today.get(Calendar.DAY_OF_MONTH),
+            (selectedMonth.clone() as Calendar).getActualMaximum(Calendar.DAY_OF_MONTH)
+        )
+        (selectedMonth.clone() as Calendar).apply {
+            set(Calendar.DAY_OF_MONTH, dayInMonth)
+            set(Calendar.HOUR_OF_DAY, 12)
+            set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+    }
+
     var name by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
-    var date by remember { mutableStateOf(System.currentTimeMillis()) }
+    var date by remember(defaultDateMillis) { mutableStateOf(defaultDateMillis) }
     var note by remember { mutableStateOf("") }
 
     Box(

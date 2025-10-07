@@ -3,6 +3,7 @@ package ee.ut.cs.budgetly.nav
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,14 +35,22 @@ fun BudgetlyNavGraph() {
                 onMenuClick = { nav.navigate("about") }
             )
         }
-        composable("add") {
-            val viewModel: AddExpenseViewModel = viewModel()
-            val categories by viewModel.categories.collectAsState()
+        composable("add") { backStackEntry ->
+            // Share HomeViewModel from the "home" destination
+            val parentEntry = remember(backStackEntry) {
+                nav.getBackStackEntry("home")
+            }
+            val homeVm: HomeViewModel = viewModel(parentEntry)
+            val selectedMonth by homeVm.selectedMonth.collectAsState()
+
+            val addVm: AddExpenseViewModel = viewModel(backStackEntry)
+            val categories by addVm.categories.collectAsState()
 
             AddExpenseScreen(
                 categoryList = categories,
+                selectedMonth = selectedMonth,
                 onSave = { name, amount, categoryId, date, note ->
-                    viewModel.addExpense(name, amount, categoryId, date, note)
+                    addVm.addExpense(name, amount, categoryId, date, note)
                     nav.popBackStack()
                 },
                 onCancel = { nav.popBackStack() }

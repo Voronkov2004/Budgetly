@@ -27,6 +27,7 @@ import ee.ut.cs.budgetly.domain.model.CategoryExpenseSummary
 import ee.ut.cs.budgetly.ui.component.CategoryPieChart
 import java.util.Calendar
 import java.util.Locale
+import androidx.core.graphics.toColorInt
 
 
 @Composable
@@ -177,13 +178,44 @@ fun HomeScreen(
 
 
                         items(categoryExpenses) { item ->
+                            val swatchColor = remember(item.color) {
+                                val parsedInt: Int = item.color?.let { hex ->
+                                    val cleaned = hex.trim()
+                                    val normalized = when {
+                                        cleaned.startsWith("#") -> cleaned
+                                        cleaned.startsWith("0x", ignoreCase = true) -> "#${cleaned.drop(2)}"
+                                        else -> "#$cleaned"
+                                    }
+                                    runCatching { normalized.toColorInt() }
+                                        .getOrElse { 0xFF9E9E9E.toInt() }
+                                } ?: 0xFF9E9E9E.toInt()
+
+                                Color(parsedInt)
+                            }
+
                             Row(
-                                Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(item.categoryName, style = MaterialTheme.typography.bodyLarge)
-                                Text("${item.totalAmount} €", style = MaterialTheme.typography.bodyLarge)
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        Modifier
+                                            .size(12.dp)
+                                            .clip(RoundedCornerShape(3.dp))
+                                            .background(swatchColor)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(item.categoryName, style = MaterialTheme.typography.bodyLarge)
+                                }
+
+                                Text(
+                                    String.format(Locale.getDefault(), "%,.2f €", item.totalAmount),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
                             }
+
                             HorizontalDivider(
                                 Modifier,
                                 DividerDefaults.Thickness,

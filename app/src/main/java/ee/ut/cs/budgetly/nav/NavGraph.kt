@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import ee.ut.cs.budgetly.ui.screens.AddExpenseScreen
 import ee.ut.cs.budgetly.ui.screens.HomeScreen
+import ee.ut.cs.budgetly.ui.screens.AboutScreen
 import ee.ut.cs.budgetly.ui.viewmodel.AddExpenseViewModel
 import ee.ut.cs.budgetly.ui.viewmodel.HomeViewModel
 
@@ -29,7 +30,8 @@ fun BudgetlyNavGraph() {
                 categoryExpenses = categoryExpenses,
                 onPrevMonth = { viewModel.prevMonth() },
                 onNextMonth = { viewModel.nextMonth() },
-                onAddClick = { nav.navigate("add") }
+                onAddClick = { nav.navigate("add") },
+                onMenuClick = { nav.navigate("about") }
             )
         }
         composable("add") {
@@ -45,6 +47,10 @@ fun BudgetlyNavGraph() {
                 onCancel = { nav.popBackStack() }
             )
         }
-
+        composable("about") {
+            AboutScreen(
+                onBackClick = { nav.popBackStack() }
+            )
+        }
     }
 }

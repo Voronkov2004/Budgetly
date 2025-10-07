@@ -43,6 +43,29 @@ By automating routine tasks and giving users a clear overview of their finances,
 - **Gradle** – Build automation and dependency management
 
 
+## Running the Test Application
+To launch and test the **Budgetly** application locally, follow these steps:
+
+1. **Clone the repository**  
+   - Open a terminal and execute 'git clone https://github.com/Voronkov2004/Budgetly.git'
+
+2. **Open the project in Android Studio**
+    - Select **Open an existing project** and navigate to the cloned repository folder.
+
+3. **Sync Gradle**
+    - Android Studio will usually perform this automatically.
+    - If required, click **File > Sync Project with Gradle Files**.
+
+4. **Run the application**
+    - Click the **Run** button in the toolbar.
+    - Select either a connected Android device or an emulator to launch the app.
+
+5. **Verify functionality**
+    - **Home Screen**: Displays current expenses and categories.
+    - **Add Expense Screen**: Use the + button to create a new expense entry.
+    - **About Screen**: Navigate to view the user profile, including the profile picture, username, and total spendings.
+
+
 ## Collaborators and roles
 1. Anton Voronkov – Lead Manager & Developer, coordinates tasks and contributes to coding features.
 2. Jessenia Tsenkman – Designer & Developer, focuses on UI/UX and contributes to coding features.

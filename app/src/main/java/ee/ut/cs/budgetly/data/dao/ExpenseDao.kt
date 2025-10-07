@@ -31,4 +31,15 @@ interface ExpenseDao {
     @Query("SELECT * FROM Expense")
     suspend fun getAll(): List<Expense>
 
+    @Query("""
+    SELECT COALESCE(SUM(amount), 0)
+    FROM expense
+    WHERE date BETWEEN :startTimestamp AND :endTimestamp
+""")
+    fun getTotalSpendingForMonth(
+        startTimestamp: Long,
+        endTimestamp: Long
+    ): Flow<Double>
+
+
 }

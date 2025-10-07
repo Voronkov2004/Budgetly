@@ -42,6 +42,10 @@ fun HomeScreen(
     val cs = MaterialTheme.colorScheme
     val creamShape = RoundedCornerShape(24.dp)
 
+    val total = remember(categoryExpenses) {
+        categoryExpenses.sumOf { it.totalAmount }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -185,6 +189,27 @@ fun HomeScreen(
                                 DividerDefaults.Thickness,
                                 color = Color.Gray.copy(alpha = 0.3f)
                             )
+                        }
+                        item {
+                            Spacer(Modifier.height(4.dp))
+                            HorizontalDivider(
+                                Modifier,
+                                DividerDefaults.Thickness,
+                                color = Color.Gray.copy(alpha = 0.5f)
+                            )
+                            Row(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 10.dp, bottom = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text("Total", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(
+                                    String.format(Locale.getDefault(), "%,.2f €", total),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     } }
                 }

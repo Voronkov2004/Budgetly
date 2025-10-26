@@ -44,10 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ee.ut.cs.budgetly.data.entity.Category
+import ee.ut.cs.budgetly.ui.viewmodel.AddExpenseViewModel
 import java.util.Calendar
 
 @Composable
 fun AddExpenseScreen(
+    viewModel: AddExpenseViewModel,
     categoryList: List<Category>,
     selectedMonth: Calendar,
     onSave: (name: String, amount: Double, categoryId: Int, date: Long, note: String?) -> Unit,
@@ -161,6 +163,49 @@ fun AddExpenseScreen(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
+                val context = androidx.compose.ui.platform.LocalContext.current
+                Button(
+                    onClick = {
+                        if (name.isNotBlank()) {
+                            viewModel.fetchCategoryFromApi(name) { suggestedCategory ->
+
+                                if (!suggestedCategory.isNullOrEmpty()) {
+                                    val matchedCategory = categoryList.find { it.name.equals(suggestedCategory.trim(), ignoreCase = true) }
+                                    if (matchedCategory != null) {
+                                        selectedCategory = matchedCategory
+                                    } else {
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            "Suggested category '$suggestedCategory' not found in list",
+                                            android.widget.Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Could not determine category automatically",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        } else {
+                            android.widget.Toast.makeText(
+                                context,
+                                "Enter the expense name first",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Auto Assign Category")
+                }
+
 
                 Spacer(modifier = Modifier.height(12.dp))
 

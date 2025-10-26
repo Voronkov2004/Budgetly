@@ -36,7 +36,6 @@ fun BudgetlyNavGraph() {
             )
         }
         composable("add") { backStackEntry ->
-            // Share HomeViewModel from the "home" destination
             val parentEntry = remember(backStackEntry) {
                 nav.getBackStackEntry("home")
             }
@@ -47,6 +46,7 @@ fun BudgetlyNavGraph() {
             val categories by addVm.categories.collectAsState()
 
             AddExpenseScreen(
+                viewModel = addVm,
                 categoryList = categories,
                 selectedMonth = selectedMonth,
                 onSave = { name, amount, categoryId, date, note ->

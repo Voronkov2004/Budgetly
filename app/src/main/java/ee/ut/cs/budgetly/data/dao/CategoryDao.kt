@@ -11,4 +11,6 @@ interface CategoryDao {
     @Insert suspend fun insert(category: Category): Long
     @Query("SELECT * FROM category") fun getAll(): Flow<List<Category>>
 
+    @Query("SELECT * FROM category")
+    suspend fun getAllOnce(): List<Category>
 }

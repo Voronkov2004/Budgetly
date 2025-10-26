@@ -1,4 +1,6 @@
-
+import java.lang.System.load
+import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -7,11 +9,20 @@ plugins {
     id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply true
 }
 
+val localProperties = Properties().apply {
+    load(FileInputStream(rootProject.file("local.properties")))
+}
+
 android {
     namespace = "ee.ut.cs.budgetly"
     compileSdk = 36
 
     defaultConfig {
+
+        buildFeatures{
+            buildConfig = true
+        }
+
         applicationId = "ee.ut.cs.budgetly"
         minSdk = 24
         targetSdk = 36
@@ -19,6 +30,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val myApiKey: String = localProperties.getProperty("OPENAI_API_KEY")
+        buildConfigField("String", "OPENAI_API_KEY", "\"$myApiKey\"")
     }
 
     buildTypes {
@@ -39,6 +53,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -105,4 +120,7 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
+
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 }

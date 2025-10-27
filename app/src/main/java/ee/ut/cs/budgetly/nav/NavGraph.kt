@@ -26,9 +26,13 @@ fun BudgetlyNavGraph() {
             val categoryExpenses by viewModel.categoryExpenses.collectAsState()
 
             val selectedMonth by viewModel.selectedMonth.collectAsState()
+
+            val isLoading by viewModel.isLoading
+
             HomeScreen(
                 selectedMonth = selectedMonth,
                 categoryExpenses = categoryExpenses,
+                isLoading = isLoading,
                 onPrevMonth = { viewModel.prevMonth() },
                 onNextMonth = { viewModel.nextMonth() },
                 onAddClick = { nav.navigate("add") },

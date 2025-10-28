@@ -1,10 +1,14 @@
 package ee.ut.cs.budgetly.ui.viewmodel
 
+import android.Manifest
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Looper
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import ee.ut.cs.budgetly.BuildConfig
 import ee.ut.cs.budgetly.data.database.AppDatabase
@@ -13,20 +17,12 @@ import ee.ut.cs.budgetly.data.entity.Expense
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType
+import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.Response
 import org.json.JSONObject
 import java.io.IOException
-import java.util.logging.Handler
 
 class AddExpenseViewModel(application: Application) : AndroidViewModel(application)  {
     private val expenseDao = AppDatabase.getInstance(application).expenseDao()
@@ -37,34 +33,36 @@ class AddExpenseViewModel(application: Application) : AndroidViewModel(applicati
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     fun addExpense(name: String, amount: Double, categoryId: Int, date: Long, note: String?) {
-
         viewModelScope.launch(Dispatchers.IO) {
-            expenseDao.insert(
-                Expense(
-                    name = name,
-                    amount = amount,
-                    categoryId = categoryId,
-                    date = date,
-                    note = note
-                )
-            )
+            expenseDao.insert(Expense( name = name, amount = amount, categoryId = categoryId, date = date, note = note ))
         }
     }
 
     fun fetchCategoryFromApi(name: String, onResult: (String?) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) @androidx.annotation.RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE) {
+            if (apiKey.isNullOrBlank()) {
+                Log.e("AddExpenseViewModel", "OPENAI_API_KEY is missing")
+                postMain { onResult(null) }
+                return@launch
+            }
+            if (!isOnline()) {
+                Log.w("AddExpenseViewModel", "No internet connection")
+                postMain { onResult(null) }
+                return@launch
+            }
+
             val categoryList = categoryDao.getAllOnce()
             val categoryNames = categoryList.map { it.name }
-            Log.d("AddExpenseViewModel", "CATEGORY NAMES: $categoryNames")
             val requestBody = """
-        {
-            "model": "gpt-4o-mini",
-            "messages": [
-                {"role": "system", "content": "You are a financial assistant that classifies expenses into categories"},
-                {"role": "user", "content": "Classify the expense '$name' into one of the following category: ${categoryNames.joinToString (", ")}. Return only the category name exactly as in this list: ${categoryNames.joinToString (", ")}"}
-            ]
-        }
-        """.trimIndent()
+                {
+                  "model": "gpt-4o-mini",
+                  "messages": [
+                    {"role": "system", "content": "You are a financial assistant that classifies expenses into categories"},
+                    {"role": "user", "content": "Classify the expense '$name' into one of the following category: ${categoryNames.joinToString(", ")}. Return only the category name exactly as in this list: ${categoryNames.joinToString(", ")}"}
+                  ],
+                  "temperature": 0
+                }
+            """.trimIndent()
 
             val request = Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
@@ -75,33 +73,49 @@ class AddExpenseViewModel(application: Application) : AndroidViewModel(applicati
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    android.os.Handler(Looper.getMainLooper()).post {
-                        onResult(null)
-                    }
+                    Log.e("AddExpenseViewModel", "Network call failed: ${e.message}")
+                    postMain { onResult(null) }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    val category = if (!response.isSuccessful) {
-                        null
-                    } else {
-                        val json = JSONObject(response.body!!.string())
-                        json.getJSONArray("choices")
-                            .getJSONObject(0)
-                            .getJSONObject("message")
-                            .getString("content")
-                            .trim()
-                    }
+                    response.use {
+                        val category = try {
+                            if (!response.isSuccessful) null
+                            else {
+                                val body = response.body?.string().orEmpty()
+                                val json = JSONObject(body)
+                                json.getJSONArray("choices")
+                                    .getJSONObject(0)
+                                    .getJSONObject("message")
+                                    .getString("content")
+                                    .trim()
+                            }
+                        } catch (t: Throwable) {
+                            Log.e("AddExpenseViewModel", "Parse error: ${t.message}")
+                            null
+                        }
 
-                    android.os.Handler(Looper.getMainLooper()).post {
-                        Log.d("AddExpenseViewModel", "Fetched category: $category")
-                        Log.d("AddExpenseViewModel", "Sent message: $requestBody")
-                        Log.d("AddExpenseViewModel", "KEYKEY: $apiKey")
-                        onResult(category)
+                        postMain {
+                            Log.d("AddExpenseViewModel", "Fetched category: $category")
+                            onResult(category)
+                        }
                     }
                 }
             })
         }
     }
 
+    private fun postMain(block: () -> Unit) =
+        android.os.Handler(Looper.getMainLooper()).post(block)
 
+    @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+    private fun isOnline(): Boolean {
+        val cm = getApplication<Application>()
+            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val net = cm.activeNetwork ?: return false
+        val caps = cm.getNetworkCapabilities(net) ?: return false
+        return caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                caps.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+    }
 }

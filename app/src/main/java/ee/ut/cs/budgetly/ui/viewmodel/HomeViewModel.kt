@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import java.util.Calendar
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.State
+
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -23,31 +26,38 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dao: ExpenseDao
 
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: State<Boolean> = _isLoading
+
     val categoryExpenses: StateFlow<List<CategoryExpenseSummary>>
 
     init {
 
         dao = AppDatabase.getInstance(application).expenseDao()
 
-        categoryExpenses = _selectedMonth.flatMapLatest { cal ->
-            val startCal = cal.clone() as Calendar
-            startCal.set(Calendar.DAY_OF_MONTH, 1)
-            startCal.set(Calendar.HOUR_OF_DAY, 0)
-            startCal.set(Calendar.MINUTE, 0)
-            startCal.set(Calendar.SECOND, 0)
-            startCal.set(Calendar.MILLISECOND, 0)
-            val startTimestamp = startCal.timeInMillis
+        categoryExpenses = _selectedMonth
+            .onEach { _isLoading.value = true } //start loading
+            .flatMapLatest { cal ->
+                val startCal = cal.clone() as Calendar
+                startCal.set(Calendar.DAY_OF_MONTH, 1)
+                startCal.set(Calendar.HOUR_OF_DAY, 0)
+                startCal.set(Calendar.MINUTE, 0)
+                startCal.set(Calendar.SECOND, 0)
+                startCal.set(Calendar.MILLISECOND, 0)
+                val startTimestamp = startCal.timeInMillis
 
-            val endCal = cal.clone() as Calendar
-            endCal.set(Calendar.DAY_OF_MONTH, endCal.getActualMaximum(Calendar.DAY_OF_MONTH))
-            endCal.set(Calendar.HOUR_OF_DAY, 23)
-            endCal.set(Calendar.MINUTE, 59)
-            endCal.set(Calendar.SECOND, 59)
-            endCal.set(Calendar.MILLISECOND, 999)
-            val endTimestamp = endCal.timeInMillis
+                val endCal = cal.clone() as Calendar
+                endCal.set(Calendar.DAY_OF_MONTH, endCal.getActualMaximum(Calendar.DAY_OF_MONTH))
+                endCal.set(Calendar.HOUR_OF_DAY, 23)
+                endCal.set(Calendar.MINUTE, 59)
+                endCal.set(Calendar.SECOND, 59)
+                endCal.set(Calendar.MILLISECOND, 999)
+                val endTimestamp = endCal.timeInMillis
 
-            dao.getCategoryExpenseSummaryForMonth(startTimestamp, endTimestamp)
-        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+                dao.getCategoryExpenseSummaryForMonth(startTimestamp, endTimestamp)
+            }
+            .onEach { _isLoading.value = false } //stop loading when data arrives
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     }
 
     fun prevMonth() {

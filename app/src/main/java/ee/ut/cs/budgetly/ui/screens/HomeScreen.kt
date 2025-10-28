@@ -37,7 +37,8 @@ fun HomeScreen(
     onPrevMonth: () -> Unit = {},
     onNextMonth: () -> Unit = {},
     categoryExpenses: List<CategoryExpenseSummary> = emptyList(),
-    selectedMonth: Calendar
+    selectedMonth: Calendar,
+    isLoading: Boolean = false
 
 ) {
     val cs = MaterialTheme.colorScheme
@@ -248,4 +249,15 @@ fun HomeScreen(
             }
         }
     }
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
+    }
+
 }

@@ -163,49 +163,6 @@ fun AddExpenseScreen(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 )
-                val context = androidx.compose.ui.platform.LocalContext.current
-                Button(
-                    onClick = {
-                        if (name.isNotBlank()) {
-                            viewModel.fetchCategoryFromApi(name) { suggestedCategory ->
-
-                                if (!suggestedCategory.isNullOrEmpty()) {
-                                    val matchedCategory = categoryList.find { it.name.equals(suggestedCategory.trim(), ignoreCase = true) }
-                                    if (matchedCategory != null) {
-                                        selectedCategory = matchedCategory
-                                    } else {
-                                        android.widget.Toast.makeText(
-                                            context,
-                                            "Suggested category '$suggestedCategory' not found in list",
-                                            android.widget.Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                } else {
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        "Could not determine category automatically",
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        } else {
-                            android.widget.Toast.makeText(
-                                context,
-                                "Enter the expense name first",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Auto Assign Category")
-                }
-
 
                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -241,26 +198,60 @@ fun AddExpenseScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
                 // Category dropdown
+                val context = androidx.compose.ui.platform.LocalContext.current
+
                 Text(
                     text = "Category",
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     ),
-
                     color = cs.onSurface,
                     modifier = Modifier.padding(bottom = 4.dp, start = 4.dp)
                 )
-                DropdownMenuWrapper(
-                    options = categoryList.map { it.name },
-                    selectedOption = selectedCategory?.name,
-                    onOptionSelected = { selectedName ->
-                        selectedCategory = categoryList.find { it.name == selectedName }
+
+                CategorySelectorRow(
+                    categoryList = categoryList,
+                    selectedCategory = selectedCategory,
+                    onCategorySelected = { cat ->
+                        selectedCategory = cat
+                    },
+                    onAutoAssignClick = {
+                        if (name.isNotBlank()) {
+                            viewModel.fetchCategoryFromApi(name) { suggestedCategory ->
+                                if (!suggestedCategory.isNullOrEmpty()) {
+                                    val matchedCategory = categoryList.find {
+                                        it.name.equals(suggestedCategory.trim(), ignoreCase = true)
+                                    }
+                                    if (matchedCategory != null) {
+                                        selectedCategory = matchedCategory
+                                    } else {
+                                        android.widget.Toast.makeText(
+                                            context,
+                                            "Suggested category '$suggestedCategory' not found in list",
+                                            android.widget.Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                } else {
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "Could not determine category automatically",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        } else {
+                            android.widget.Toast.makeText(
+                                context,
+                                "Enter the expense name first",
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 )
 
+
                 Spacer(modifier = Modifier.height(12.dp))
-                // Note (optional)
                 Text(
                     text = "Notes",
                     style = MaterialTheme.typography.bodyLarge.copy(
@@ -292,7 +283,6 @@ fun AddExpenseScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Buttons
                 Row(
                     horizontalArrangement = Arrangement.End,
                     modifier = Modifier.fillMaxWidth()
@@ -387,7 +377,6 @@ fun DropdownMenuWrapper(
     var expanded by remember { mutableStateOf(false) }
 
     Box {
-        // The visible selection field
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -438,4 +427,41 @@ fun DropdownMenuWrapper(
     }
 }
 
+@Composable
+fun CategorySelectorRow(
+    categoryList: List<Category>,
+    selectedCategory: Category?,
+    onCategorySelected: (Category) -> Unit,
+    onAutoAssignClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
+        ) {
+            DropdownMenuWrapper(
+                options = categoryList.map { it.name },
+                selectedOption = selectedCategory?.name,
+                onOptionSelected = { selectedName ->
+                    categoryList.find { it.name == selectedName }?.let { onCategorySelected(it) }
+                }
+            )
+        }
 
+        Button(
+            onClick = onAutoAssignClick,
+            modifier = Modifier.height(56.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
+        ) {
+            Text("Auto")
+        }
+    }
+}

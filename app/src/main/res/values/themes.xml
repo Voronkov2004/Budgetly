@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.Budgetly" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Budgetly.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@drawable/splash_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/budgetly_icon2</item>
+        <item name="postSplashScreenTheme">@style/Theme.Budgetly</item>
+    </style>
 </resources>

@@ -1,5 +1,8 @@
 package ee.ut.cs.budgetly.nav
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,11 +16,14 @@ import ee.ut.cs.budgetly.ui.screens.HomeScreen
 import ee.ut.cs.budgetly.ui.screens.AboutScreen
 import ee.ut.cs.budgetly.ui.viewmodel.AddExpenseViewModel
 import ee.ut.cs.budgetly.ui.viewmodel.HomeViewModel
+import ee.ut.cs.budgetly.ui.viewmodel.ThemeViewModel
 
 
 @Composable
 fun BudgetlyNavGraph() {
     val nav = rememberNavController()
+    val themeViewModel: ThemeViewModel = viewModel()
+    val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
     NavHost(nav, startDestination = "home") {
         composable("home") {
 
@@ -36,7 +42,9 @@ fun BudgetlyNavGraph() {
                 onPrevMonth = { viewModel.prevMonth() },
                 onNextMonth = { viewModel.nextMonth() },
                 onAddClick = { nav.navigate("add") },
-                onMenuClick = { nav.navigate("about") }
+                onMenuClick = { nav.navigate("about") },
+                onToggleTheme = { themeViewModel.toggleTheme() },
+                isDarkMode = isDarkTheme
             )
         }
         composable("add") { backStackEntry ->
@@ -57,12 +65,15 @@ fun BudgetlyNavGraph() {
                     addVm.addExpense(name, amount, categoryId, date, note)
                     nav.popBackStack()
                 },
-                onCancel = { nav.popBackStack() }
+                onCancel = { nav.popBackStack() },
+                isDarkMode = isDarkTheme
             )
         }
         composable("about") {
             AboutScreen(
-                onBackClick = { nav.popBackStack() }
+                onBackClick = { nav.popBackStack() },
+                onToggleTheme = { themeViewModel.toggleTheme() },
+                isDarkMode = isDarkTheme
             )
         }
     }

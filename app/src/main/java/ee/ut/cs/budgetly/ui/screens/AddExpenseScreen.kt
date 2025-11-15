@@ -53,7 +53,8 @@ fun AddExpenseScreen(
     categoryList: List<Category>,
     selectedMonth: Calendar,
     onSave: (name: String, amount: Double, categoryId: Int, date: Long, note: String?) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    isDarkMode: Boolean = false,
 ) {
     val cs = MaterialTheme.colorScheme
     val creamShape = RoundedCornerShape(24.dp)
@@ -156,9 +157,11 @@ fun AddExpenseScreen(
                         disabledIndicatorColor = Color.Transparent,
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
-                        focusedTextColor = cs.onSurface,
-                        unfocusedTextColor = cs.onSurface,
-                        cursorColor = cs.primary
+                        cursorColor = cs.primary,
+                        focusedTextColor = if (isDarkMode) Color.Black else cs.onSurface,
+                        unfocusedTextColor = if (isDarkMode) Color.Black else cs.onSurface,
+                        focusedLabelColor = if (isDarkMode) Color.Black else cs.onSurface.copy(alpha = 0.7f),
+                        unfocusedLabelColor = if (isDarkMode) Color.Black else cs.onSurface.copy(alpha = 0.7f),
                     ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -231,9 +234,11 @@ fun AddExpenseScreen(
                         disabledIndicatorColor = Color.Transparent,
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
-                        focusedTextColor = cs.onSurface,
-                        unfocusedTextColor = cs.onSurface,
-                        cursorColor = cs.primary
+                        focusedTextColor = if (isDarkMode) Color.Black else cs.onSurface,
+                        unfocusedTextColor = if (isDarkMode) Color.Black else cs.onSurface,
+                        focusedLabelColor = if (isDarkMode) Color.Black else cs.onSurface.copy(alpha = 0.7f),
+                        unfocusedLabelColor = if (isDarkMode) Color.Black else cs.onSurface.copy(alpha = 0.7f),
+                        cursorColor = cs.primary,
                     ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -256,7 +261,8 @@ fun AddExpenseScreen(
                     selectedOption = selectedCategory?.name,
                     onOptionSelected = { selectedName ->
                         selectedCategory = categoryList.find { it.name == selectedName }
-                    }
+                    },
+                    isDarkMode = isDarkMode
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -282,9 +288,11 @@ fun AddExpenseScreen(
                         disabledIndicatorColor = Color.Transparent,
                         focusedContainerColor = Color.White,
                         unfocusedContainerColor = Color.White,
-                        focusedTextColor = cs.onSurface,
-                        unfocusedTextColor = cs.onSurface,
-                        cursorColor = cs.primary
+                        cursorColor = cs.primary,
+                        focusedTextColor = if (isDarkMode) Color.Black else cs.onSurface,
+                        unfocusedTextColor = if (isDarkMode) Color.Black else cs.onSurface,
+                        focusedLabelColor = if (isDarkMode) Color.Black else cs.onSurface.copy(alpha = 0.7f),
+                        unfocusedLabelColor = if (isDarkMode) Color.Black else cs.onSurface.copy(alpha = 0.7f),
                     ),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth().height(160.dp)
@@ -382,7 +390,8 @@ fun AddExpenseScreen(
 fun DropdownMenuWrapper(
     options: List<String>,
     selectedOption: String?,
-    onOptionSelected: (String) -> Unit
+    onOptionSelected: (String) -> Unit,
+    isDarkMode: Boolean = false,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -404,7 +413,7 @@ fun DropdownMenuWrapper(
             ) {
                 Text(
                     text = selectedOption ?: "Select Category",
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = if (isDarkMode) Color.Black else MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Icon(

@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -38,7 +40,9 @@ fun HomeScreen(
     onNextMonth: () -> Unit = {},
     categoryExpenses: List<CategoryExpenseSummary> = emptyList(),
     selectedMonth: Calendar,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    onToggleTheme: () -> Unit = {},
+    isDarkMode: Boolean = false,
 
 ) {
     val cs = MaterialTheme.colorScheme
@@ -97,6 +101,12 @@ fun HomeScreen(
                     },
                     title = {},
                     actions = {
+                        IconButton(onClick = onToggleTheme) {
+                            Icon(
+                                imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                                contentDescription = "Toggle theme"
+                            )
+                        }
                         IconButton(onClick = onAddClick) { Icon(Icons.Default.Add, null) }
                     }
                 )

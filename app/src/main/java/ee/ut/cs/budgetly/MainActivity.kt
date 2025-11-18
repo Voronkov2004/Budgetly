@@ -19,7 +19,7 @@ import ee.ut.cs.budgetly.nav.BudgetlyNavGraph
 import ee.ut.cs.budgetly.ui.theme.BudgetlyTheme
 import ee.ut.cs.budgetly.ui.viewmodel.ThemeViewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import ee.ut.cs.budgetly.ui.viewmodel.ThemeViewModel
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

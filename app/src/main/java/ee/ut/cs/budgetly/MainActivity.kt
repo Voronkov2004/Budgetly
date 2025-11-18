@@ -8,17 +8,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ee.ut.cs.budgetly.nav.BudgetlyNavGraph
 import ee.ut.cs.budgetly.ui.theme.BudgetlyTheme
 import ee.ut.cs.budgetly.ui.viewmodel.ThemeViewModel
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 
 class MainActivity : ComponentActivity() {

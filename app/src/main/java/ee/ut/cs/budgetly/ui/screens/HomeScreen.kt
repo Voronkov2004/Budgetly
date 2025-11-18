@@ -1,25 +1,20 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 package ee.ut.cs.budgetly.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.background
-import androidx.compose.material3.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -27,9 +22,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ee.ut.cs.budgetly.domain.model.CategoryExpenseSummary
 import ee.ut.cs.budgetly.ui.component.CategoryPieChart
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 import androidx.core.graphics.toColorInt
+
 
 
 @Composable
@@ -46,84 +41,60 @@ fun HomeScreen(
 
 ) {
     val cs = MaterialTheme.colorScheme
-    val creamShape = RoundedCornerShape(24.dp)
-
     val total = remember(categoryExpenses) {
         categoryExpenses.sumOf { it.totalAmount }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(cs.background)   // OCHRE main background
-    ) {
-        val topBandShape = RoundedCornerShape(
-            bottomStart = 20.dp,
-            bottomEnd = 20.dp
-        )
-        val bottomBandShape = RoundedCornerShape(
-            topStart = 20.dp,
-            topEnd = 20.dp
-        )
 
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .height(200.dp)
-                .clip(topBandShape)
-                .background(cs.primary, topBandShape) // topBar
-
-        )
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .clip(bottomBandShape)
-                .fillMaxWidth()
-                .height(120.dp)
-                .background(cs.primary, bottomBandShape)    // bottomBar
-        )
-
-
-        Scaffold(
-            containerColor = Color.Transparent,
-            topBar = {
-                TopAppBar(
-                    modifier = Modifier.statusBarsPadding(),
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                        navigationIconContentColor = cs.onPrimary,
-                        actionIconContentColor = cs.onPrimary,
-                        titleContentColor = cs.onPrimary
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = onMenuClick) { Icon(Icons.Default.Menu, null) }
-                    },
-                    title = {},
-                    actions = {
-                        IconButton(onClick = onToggleTheme) {
-                            Icon(
-                                imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
-                                contentDescription = "Toggle theme"
-                            )
-                        }
-                        IconButton(onClick = onAddClick) { Icon(Icons.Default.Add, null) }
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Budgetly", style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
+                },
+                actions = {
+                    IconButton(onClick = onToggleTheme) {
+                        Icon(
+                            imageVector = if (isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                            contentDescription = "Toggle Theme"
+                        )
+                    }
+                    IconButton(onClick = onAddClick) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Expense"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = cs.primary,
+                    titleContentColor = cs.onPrimary,
+                    navigationIconContentColor = cs.onPrimary,
+                    actionIconContentColor = cs.onPrimary
                 )
-            }
-        ) { inner ->
-            // Foreground
+            )
+        },
+
+        containerColor = cs.background
+    ) { inner ->
+        Box(
+            modifier = Modifier
+                .padding(inner)
+                .fillMaxSize()
+                .background(cs.background)
+        ) {
             Surface(
                 modifier = Modifier
-                    .padding(inner)
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(16.dp),
                 color = cs.surface,
-                shape = creamShape,
+                shape = RoundedCornerShape(24.dp),
                 tonalElevation = 3.dp
             ) {
-                Column(Modifier.fillMaxSize().padding(16.dp)) {
-
+                Column(Modifier.padding(16.dp)) {
                     // Month selector
                     Surface(
                         color = cs.primaryContainer,
@@ -146,128 +117,128 @@ fun HomeScreen(
                         }
                     }
 
-                    Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                    // Placeholders
+                    // Pie chart area
                     Card(
-                        modifier = Modifier.fillMaxWidth().height(220.dp),
-                        shape = RoundedCornerShape(16.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = cs.surfaceVariant),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (categoryExpenses.isNotEmpty()) {
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = categoryExpenses.isNotEmpty(),
+                                enter = EnterTransition.None,
+                                exit = ExitTransition.None
+                            ) {
                                 CategoryPieChart(categoryExpenses)
-                            } else {
-                                Text("No data", style = MaterialTheme.typography.bodyMedium)
+                            }
+                            if (categoryExpenses.isEmpty()) {
+                                Text(
+                                    text = "No data yet",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = cs.onSurfaceVariant
+                                )
                             }
                         }
                     }
 
-                    Spacer(Modifier.height(20.dp))
 
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // Category list
                     Card(
-                        modifier = Modifier.fillMaxWidth().weight(1f),
-                        shape = RoundedCornerShape(16.dp)
-                    ) { LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        LazyColumn(modifier = Modifier.padding(16.dp)) {
+                            item {
+                                Row(
+                                    Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("Category", style = MaterialTheme.typography.titleMedium)
+                                    Text("Spent", style = MaterialTheme.typography.titleMedium)
+                                }
+                                HorizontalDivider(color = cs.outlineVariant)
 
-                        item {
-                            Row(
-                                Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("Category", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                                Text("Spent", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                            }
-                            HorizontalDivider(
-                                Modifier,
-                                DividerDefaults.Thickness,
-                                color = Color.Gray.copy(alpha = 0.3f)
-                            )
-                        }
-
-
-                        items(categoryExpenses) { item ->
-                            val swatchColor = remember(item.color) {
-                                val parsedInt: Int = item.color?.let { hex ->
-                                    val cleaned = hex.trim()
-                                    val normalized = when {
-                                        cleaned.startsWith("#") -> cleaned
-                                        cleaned.startsWith("0x", ignoreCase = true) -> "#${cleaned.drop(2)}"
-                                        else -> "#$cleaned"
-                                    }
-                                    runCatching { normalized.toColorInt() }
-                                        .getOrElse { 0xFF9E9E9E.toInt() }
-                                } ?: 0xFF9E9E9E.toInt()
-
-                                Color(parsedInt)
                             }
 
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        Modifier
-                                            .size(12.dp)
-                                            .clip(RoundedCornerShape(3.dp))
-                                            .background(swatchColor)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(item.categoryName, style = MaterialTheme.typography.bodyLarge)
+                            items(categoryExpenses) { item ->
+                                val swatchColor = remember(item.color) {
+                                    val parsedInt: Int = item.color?.let { hex ->
+                                        val normalized = when {
+                                            hex.startsWith("#") -> hex
+                                            hex.startsWith("0x", true) -> "#${hex.drop(2)}"
+                                            else -> "#$hex"
+                                        }
+                                        runCatching { normalized.toColorInt() }.getOrElse { 0xFF9E9E9E.toInt() }
+                                    } ?: 0xFF9E9E9E.toInt()
+                                    Color(parsedInt)
                                 }
 
-                                Text(
-                                    String.format(Locale.getDefault(), "%,.2f €", item.totalAmount),
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
+                                Row(
+                                    Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Box(
+                                            Modifier
+                                                .size(12.dp)
+                                                .clip(RoundedCornerShape(3.dp))
+                                                .background(swatchColor)
+                                        )
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(item.categoryName, style = MaterialTheme.typography.bodyLarge)
+                                    }
+
+                                    Text(
+                                        String.format(Locale.getDefault(), "%,.2f €", item.totalAmount),
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+
+                                Divider(color = cs.outlineVariant)
                             }
 
-                            HorizontalDivider(
-                                Modifier,
-                                DividerDefaults.Thickness,
-                                color = Color.Gray.copy(alpha = 0.3f)
-                            )
-                        }
-                        item {
-                            Spacer(Modifier.height(4.dp))
-                            HorizontalDivider(
-                                Modifier,
-                                DividerDefaults.Thickness,
-                                color = Color.Gray.copy(alpha = 0.5f)
-                            )
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 10.dp, bottom = 4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("Total", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                Text(
-                                    String.format(Locale.getDefault(), "%,.2f €", total),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
+                            item {
+                                Spacer(Modifier.height(8.dp))
+                                Divider(color = cs.outline)
+                                Row(
+                                    Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text("Total", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        String.format(Locale.getDefault(), "%,.2f €", total),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
-                    } }
+                    }
+                }
+            }
+
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = cs.primary)
                 }
             }
         }
     }
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f)),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-        }
-    }
-
 }

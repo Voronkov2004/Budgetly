@@ -62,6 +62,7 @@ dependencies {
     // Align all Compose libs with a single BOM
     implementation(platform(libs.androidx.compose.bom))   // ← keep only this BOM
 
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)

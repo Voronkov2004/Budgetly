@@ -26,7 +26,9 @@ import java.util.Locale
 @Composable
 fun AboutScreen(
     onBackClick: () -> Unit = {},
-    viewModel: AboutViewModel = viewModel()
+    viewModel: AboutViewModel = viewModel(),
+    onToggleTheme: () -> Unit = {},
+    isDarkMode: Boolean = false,
                 ) {
     val cs = MaterialTheme.colorScheme
     val creamShape = RoundedCornerShape(24.dp)

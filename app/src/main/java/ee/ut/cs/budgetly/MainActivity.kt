@@ -6,11 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ee.ut.cs.budgetly.nav.BudgetlyNavGraph
 import ee.ut.cs.budgetly.ui.theme.BudgetlyTheme
+import ee.ut.cs.budgetly.ui.viewmodel.ThemeViewModel
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import ee.ut.cs.budgetly.ui.viewmodel.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,7 +28,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BudgetlyTheme(darkTheme = false, dynamicColor = false) {
+            val themeViewModel: ThemeViewModel = viewModel()
+            val isDarkTheme by themeViewModel.isDarkTheme.collectAsState()
+
+            BudgetlyTheme(darkTheme = isDarkTheme, dynamicColor = false) {
                 BudgetlyNavGraph()
             }
         }
